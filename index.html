@@ -201,6 +201,18 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .hist .t{font-weight:900}.hist .d{font-size:.8125rem;color:var(--muted)}
 .dl{border:1px solid var(--line);background:var(--surface);color:var(--link);border-radius:999px;width:38px;height:38px;display:grid;place-items:center;cursor:pointer}
 .dl:hover{background:var(--surface-2)}
+.meses{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}
+.mes{border-radius:12px;padding:8px 6px;text-align:center;font-size:.8125rem;font-weight:900;line-height:1.25}
+.mes small{display:block;font-weight:700;font-size:.6875rem;opacity:.85}
+.mes.p{background:var(--ok-bg);color:var(--ok)}.mes.d{background:var(--bad-bg);color:var(--bad)}.mes.f{background:var(--surface-2);color:var(--muted)}
+.leyenda{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:.75rem;color:var(--muted)}
+.asis{display:flex;gap:16px;align-items:center;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+.ring{flex:none;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--azul) calc(var(--v)*1%),var(--surface-2) 0)}
+:root[data-theme="dark"] .ring{background:conic-gradient(var(--amarillo) calc(var(--v)*1%),var(--surface-2) 0)}
+.ring b{width:48px;height:48px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-weight:900;font-size:.875rem}
+.asis p{font-size:.875rem;color:var(--muted)}.asis p b{color:var(--fg)}
+.s-sub{opacity:.8;margin-top:6px}
+.btn[aria-busy="true"]{opacity:.7;pointer-events:none}
 .mbar{display:none}
 
 /* ---------- ADMIN ---------- */
@@ -352,7 +364,7 @@ footer img{width:34px;height:34px}
         <h2>Iniciar sesión</h2>
         <p class="sub">Entrá con el correo y la contraseña que te dio el club.</p>
         <div class="field"><label for="l-mail">Correo electrónico</label>
-          <input class="input" id="l-mail" type="email" autocomplete="username" placeholder="nombre@correo.com" value="mariana.rojas@correo.com"></div>
+          <input class="input" id="l-mail" type="email" autocomplete="username" placeholder="nombre@correo.com" value="davidsm004@gmail.com"></div>
         <div class="field"><label for="l-pass">Contraseña</label>
           <div class="pw"><input class="input" id="l-pass" type="password" autocomplete="current-password" value="ejemplo2030"><button type="button" data-peek="l-pass">Mostrar</button></div></div>
         <button class="btn btn-red btn-block" type="submit">Entrar
@@ -398,43 +410,36 @@ footer img{width:34px;height:34px}
   <section class="band">
     <canvas data-dots></canvas>
     <div class="saw" aria-hidden="true" style="width:520px;height:520px;right:-160px;top:-170px"><svg><use href="#saw"/></svg></div>
-    <div class="wrap s-hero"><span class="eyebrow rv">Hola de nuevo</span><h1 class="rv d1">Mariana Rojas Vargas</h1></div>
+    <div class="wrap s-hero"><span class="eyebrow rv">Hola de nuevo</span><h1 class="rv d1" id="s-nombre"></h1><p class="s-sub rv d2" id="s-sub"></p></div>
   </section>
   <div class="wrap lift">
     <div class="card saldo rv d1">
       <div class="main">
-        <div class="label">Saldo al 30 de septiembre de 2026</div>
-        <div class="amount num" id="s-amount" data-to="47500"></div>
-        <span class="pill warn">Pendiente de pago</span>
-        <div class="count" id="count">
-          <div class="box"><b id="c-d">--</b><span>días</span></div>
-          <div class="box"><b id="c-h">--</b><span>horas</span></div>
-          <p class="txt">para la fecha límite de pago, el 31 de octubre de 2026</p>
-        </div>
+        <div class="label" id="s-label"></div>
+        <div class="amount num" id="s-amount" data-to="0"></div>
+        <span class="pill" id="s-pill"></span>
+        <div class="count" id="count"></div>
       </div>
       <div class="side">
-        <div class="label">Desglose</div>
-        <div class="break num">
-          <div class="bar"><i style="width:73.7%;background:var(--azul)"></i><i style="width:26.3%;background:var(--amarillo)"></i></div>
-          <div class="row"><span><i class="dot" style="background:var(--azul)"></i>Cuotas ordinarias</span><b id="s-c1"></b></div>
-          <div class="row"><span><i class="dot" style="background:var(--amarillo)"></i>Actividades</span><b id="s-c2"></b></div>
-          <div class="row tot"><span>Total</span><b id="s-c3"></b></div>
-        </div>
-        <button class="btn btn-red btn-block" data-pdf="Septiembre 2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>Descargar PDF</button>
+        <div class="label">Resumen del estado de cuenta</div>
+        <div class="break num" id="s-break"></div>
+        <button class="btn btn-red btn-block" data-pdf="actual"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>Descargar estado de cuenta</button>
       </div>
     </div>
     <div class="grid2">
       <div class="card panel rv d2">
-        <div class="panel-h"><h2>Tu saldo mes a mes</h2><span>Últimos 6 meses</span></div>
-        <svg class="chart" id="chart" viewBox="0 0 520 230" role="img" aria-label="Saldo de los últimos seis meses"></svg>
+        <div class="panel-h"><h2>Cuotas de membresía</h2><span id="s-periodo"></span></div>
+        <div class="meses num" id="s-meses"></div>
+        <div class="leyenda"><span><i class="dot" style="background:var(--ok)"></i>Pagada</span><span><i class="dot" style="background:var(--bad)"></i>Pendiente</span><span><i class="dot" style="background:var(--line)"></i>Por venir</span></div>
+        <div class="asis"><div class="ring" id="s-ring"><b id="s-ring-v"></b></div><p id="s-asis"></p></div>
       </div>
       <div class="card panel rv d3">
-        <div class="panel-h"><h2>Estados anteriores</h2><span>PDF</span></div>
+        <div class="panel-h"><h2>Estados de cuenta</h2><span>PDF</span></div>
         <ul class="hist" id="s-hist"></ul>
       </div>
     </div>
   </div>
-  <div class="mbar"><div><div class="label">Saldo</div><b class="num" id="m-amt"></b></div><button class="btn btn-red" data-pdf="Septiembre 2026">Descargar PDF</button></div>
+  <div class="mbar"><div><div class="label">Por pagar</div><b class="num" id="m-amt"></b></div><button class="btn btn-red" data-pdf="actual">Descargar PDF</button></div>
 </main>
 
 <!-- ============ ADMIN ============ -->
@@ -501,6 +506,8 @@ footer img{width:34px;height:34px}
 <aside class="sheet" id="sheet" hidden aria-modal="true" role="dialog"></aside>
 <div class="toast" id="toast" hidden role="status"></div>
 
+<script src="lib/estado-cuenta.js"></script>
+<script src="lib/datos-ejemplo.js"></script>
 <script>
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s),root=document.documentElement;
 const fmt=n=>'₡'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -513,57 +520,79 @@ const still=()=>root.classList.contains('still')||matchMedia('(prefers-reduced-m
   d+=(k?'L':'M')+p(a0,r)+` Q${p((a0+a1)/2,R+4)} ${p(a1,R)} L${p(a2,r)} `}
   d+='Z M0 -66 A66 66 0 1 0 0.01 -66 Z';$('#sawpath').setAttribute('d',d);$('#sawpath').setAttribute('fill-rule','evenodd')})();
 
-/* Datos de ejemplo */
-let socios=[
- {n:'Mariana Rojas Vargas',m:'mariana.rojas@correo.com',p:'ejemplo2030',per:'Septiembre 2026',s:47500.00},
- {n:'Andrés Mora Jiménez',m:'andres.mora@correo.com',p:'Sierra#22',per:'Septiembre 2026',s:0},
- {n:'Daniela Céspedes Solano',m:'dani.cespedes@correo.com',p:'Reloj-532',per:'Septiembre 2026',s:125350.50},
- {n:'Felipe Arias Quesada',m:'felipe.arias@correo.com',p:'Activo!2030',per:'Septiembre 2026',s:0},
- {n:'Valeria Chaves Brenes',m:'vale.chaves@correo.com',p:'Servir_2026',per:'Agosto 2026',s:18000.00},
- {n:'José Pablo Ulate Ruiz',m:'jp.ulate@correo.com',p:'Pleno*15',per:'Septiembre 2026',s:1340899.99}
-];
+/* Datos: en la propuesta vienen de lib/datos-ejemplo.js */
+const CFG=window.CONFIG_CLUB, EC=window.EstadoCuenta;
+let socios=window.SOCIOS_EJEMPLO;
+const yo=socios[0];
+const hoy=new Date();
+const isoDe=(y,m)=>y+'-'+String(m+1).padStart(2,'0')+'-01';
+const corteActual=isoDe(hoy.getFullYear(),hoy.getMonth());
 const avColors=['#001489','#da291c','#0a1fa8','#b3241a','#747576'];
-const estado=s=>s.s===0?['ok','Al día']:s.s>500000?['bad','Moroso']:['warn','Pendiente'];
+const estado=t=>t===0?['ok','Al día']:t>=30000?['bad','Moroso']:['warn','Pendiente'];
 const ini=n=>n.split(' ').slice(0,2).map(w=>w[0]).join('');
 
 /* Socio */
-$('#s-c1').textContent=fmt(35000);$('#s-c2').textContent=fmt(12500);$('#s-c3').textContent=fmt(47500);$('#m-amt').textContent=fmt(47500);
-function countUp(el){const to=+el.dataset.to;if(still()){el.innerHTML=bigAmount(to);return}
+function renderSocio(){
+  const e=EC.calcular(yo,CFG,corteActual);
+  $('#s-nombre').textContent=yo.nombre;
+  $('#s-sub').textContent='Estado de cuenta de '+e.mesCorte+' · corte al '+e.corteLarga;
+  $('#s-label').textContent='Total por pagar al '+e.corteLarga;
+  $('#s-amount').dataset.to=e.totalPendiente;$('#s-amount').innerHTML=bigAmount(e.totalPendiente);
+  const [c,t]=estado(e.totalPendiente);$('#s-pill').className='pill '+c;$('#s-pill').textContent=t;
+  $('#m-amt').textContent=fmt(e.totalPendiente);
+  const max=Math.max(1,e.totalPendiente);
+  const colores=['var(--azul)','var(--amarillo)','var(--rojo)'];
+  $('#s-break').innerHTML=(e.totalPendiente?`<div class="bar">${e.resumen.map((r,i)=>`<i style="width:${r.pendiente/max*100}%;background:${colores[i]}"></i>`).join('')}</div>`:'')+
+    e.resumen.map((r,i)=>`<div class="row"><span><i class="dot" style="background:${colores[i]}"></i>${r.concepto}</span><b>${fmt(r.pendiente)}</b></div>`).join('')+
+    `<div class="row tot"><span>Pagado en el periodo</span><b>${fmt(e.totalPagado)}</b></div>`;
+  $('#s-periodo').textContent='Periodo '+CFG.periodo;
+  $('#s-meses').innerHTML=e.cuotas.map(q=>{const k=q.pago>=CFG.cuotaMensual?'p':q.pendiente?'d':'f';return `<div class="mes ${k}">${q.mes}<small>${k==='p'?'Pagada':k==='d'?fmt(q.pendiente):'—'}</small></div>`}).join('');
+  const pct=Math.round(e.asistencia*100);$('#s-ring').style.setProperty('--v',pct);$('#s-ring-v').textContent=pct+'%';
+  $('#s-asis').innerHTML=`<b>Calificación de asistencia</b><br>${e.sesionesRealizadas} sesiones registradas en el periodo.`;
+  tick(e);
+  const hist=[];for(let k=0;k<4;k++){const dt=new Date(hoy.getFullYear(),hoy.getMonth()-k,1);if(dt<new Date(2026,6,1))break;hist.push(isoDe(dt.getFullYear(),dt.getMonth()))}
+  $('#s-hist').innerHTML=hist.map((c,i)=>{const h=EC.calcular(yo,CFG,c);return `<li><div class="doc">PDF</div><div><div class="t">${EC.MES_LARGO[+c.slice(5,7)-1].replace(/^./,x=>x.toUpperCase())} ${c.slice(0,4)}${i===0?' · actual':''}</div><div class="d num">Por pagar ${fmt(h.totalPendiente)} · corte ${EC.corta(c)}</div></div><button class="dl" data-pdf="${c}" aria-label="Descargar estado de cuenta de ${EC.MES_LARGO[+c.slice(5,7)-1]}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg></button></li>`}).join('');
+}
+function countUp(el){const to=+el.dataset.to;if(still()||!to){el.innerHTML=bigAmount(to);return}
   const t0=performance.now(),dur=1100;const step=t=>{const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.innerHTML=bigAmount(to*e);if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
-function tick(){const due=new Date('2026-10-31T23:59:59-06:00');const ms=due-Date.now();
-  if(ms<=0){$('#count').innerHTML='<p class="txt">La fecha límite de pago fue el 31 de octubre de 2026.</p>';return}
-  $('#c-d').textContent=Math.floor(ms/864e5);$('#c-h').textContent=Math.floor(ms%864e5/36e5)}
-tick();setInterval(tick,60000);
-const hist=[['Agosto 2026','Publicado el 4 sep 2026',35000],['Julio 2026','Publicado el 3 ago 2026',0],['Junio 2026','Publicado el 5 jul 2026',17500],['Mayo 2026','Publicado el 4 jun 2026',52500]];
-$('#s-hist').innerHTML=hist.map(h=>`<li><div class="doc">PDF</div><div><div class="t">${h[0]}</div><div class="d num">${fmt(h[2])} · ${h[1]}</div></div><button class="dl" data-pdf="${h[0]}" aria-label="Descargar ${h[0]}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg></button></li>`).join('');
-(function chart(){const data=[['Abr',35000],['May',52500],['Jun',17500],['Jul',0],['Ago',35000],['Sep',47500]];
-  const W=520,H=230,L=64,B=196,T=18,max=60000,bw=46,step=(W-L-16)/data.length;let s='';
-  for(let v=0;v<=max;v+=20000){const y=B-(v/max)*(B-T);s+=`<line x1="${L}" x2="${W-8}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-dasharray="${v?'3 4':''}"/><text x="${L-10}" y="${y+4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="Lato">${v?'₡'+(v/1000)+'k':'₡0'}</text>`}
-  data.forEach(([m,v],i)=>{const x=L+i*step+(step-bw)/2,h=(v/max)*(B-T),y=B-h,last=i===data.length-1;
-    if(v>0)s+=`<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="8" fill="${last?'var(--rojo)':'var(--azul)'}" opacity="${last?1:.85}"/>`;
-    else s+=`<rect x="${x}" y="${B-4}" width="${bw}" height="4" rx="2" fill="var(--ok)"/>`;
-    s+=`<text x="${x+bw/2}" y="${B+22}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Lato" font-weight="700">${m}</text>`;
-    if(last)s+=`<text x="${x+bw/2}" y="${y-8}" text-anchor="middle" font-size="12" fill="var(--fg)" font-family="Lato" font-weight="900">₡47.5k</text>`});
-  $('#chart').innerHTML=s})();
+function tick(e){e=e||EC.calcular(yo,CFG,corteActual);const box=$('#count');
+  if(!e.totalPendiente){box.innerHTML='<p class="txt" style="max-width:none">Estás al día con el club. ¡Gracias por tu compromiso!</p>';return}
+  const due=new Date(hoy.getFullYear(),hoy.getMonth()+1,0,23,59,59),ms=due-Date.now();
+  if(ms<=0){box.innerHTML='<p class="txt">El plazo de pago de este mes ya venció.</p>';return}
+  box.innerHTML=`<div class="box"><b>${Math.floor(ms/864e5)}</b><span>días</span></div><div class="box"><b>${Math.floor(ms%864e5/36e5)}</b><span>horas</span></div><p class="txt">para ponerte al día antes del cierre de ${e.mesCorte}</p>`}
+renderSocio();setInterval(()=>tick(),60000);
+
+/* PDF: las librerías se cargan la primera vez que alguien descarga */
+let libs=null;
+function cargarLibs(){if(libs)return libs;
+  libs=['lib/jspdf.umd.min.js','lib/jspdf.plugin.autotable.min.js','lib/fuentes-pdf.js'].reduce((p,src)=>p.then(()=>new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>ko(new Error(src));document.head.appendChild(s)})),Promise.resolve());
+  return libs}
+async function descargar(socio,corte,btn){
+  btn&&btn.setAttribute('aria-busy','true');toast('Generando el estado de cuenta…');
+  try{await cargarLibs();const r=EC.generar(socio,CFG,corte,$('.head img').src);r.doc.save(r.archivo);toast('Listo: '+r.archivo)}
+  catch(err){libs=null;toast('No se pudo generar el PDF. Revisá tu conexión e intentá de nuevo.')}
+  finally{btn&&btn.removeAttribute('aria-busy')}}
 
 /* Admin */
 const shown=new Set();let filt='all';
-const ic={up:'<path d="M12 21V9m0 0-5 5m5-5 5 5M4 3h16"/>',ed:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',del:'<path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/>'};
+const ic={dl:'<path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/>',ed:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',del:'<path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/>'};
 const svg=p=>`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round">${p}</svg>`;
 function renderAdmin(){
   const q=($('#a-q').value||'').toLowerCase();
-  const list=socios.map((s,i)=>({...s,i})).filter(s=>(s.n+s.m).toLowerCase().includes(q)&&(filt==='all'||(filt==='ok'?s.s===0:s.s>0)));
-  $('#a-rows').innerHTML=`<li class="hd"><span>Socio</span><span>Contraseña</span><span>Estado</span><span style="text-align:right">Saldo</span><span style="text-align:right">Acciones</span></li>`+
-  (list.map(s=>{const [c,t]=estado(s);return `<li>
-    <div class="who"><span class="av" style="background:${avColors[s.i%avColors.length]}">${ini(s.n)}</span><div style="min-width:0"><b>${s.n}</b><span>${s.m}</span></div></div>
-    <div class="pass"><code>${shown.has(s.i)?s.p:'••••••••'}</code><button class="mini" data-show="${s.i}">${shown.has(s.i)?'Ocultar':'Ver'}</button></div>
-    <div class="stt"><span class="pill ${c}">${t}</span></div>
-    <div class="money num">${fmt(s.s)}<small>${s.per}</small></div>
-    <div class="acts"><button class="ibtn up" data-up="${s.i}" title="Subir estado de cuenta" aria-label="Subir estado de cuenta de ${s.n}">${svg(ic.up)}</button><button class="ibtn" data-ed="${s.i}" title="Editar" aria-label="Editar a ${s.n}">${svg(ic.ed)}</button><button class="ibtn del" data-del="${s.i}" title="Eliminar" aria-label="Eliminar a ${s.n}">${svg(ic.del)}</button></div></li>`}).join('')||`<li class="empty">No hay socios que coincidan con la búsqueda.</li>`);
-  const ok=socios.filter(s=>s.s===0).length;
-  $('#a-n').textContent=socios.length;$('#a-tot').textContent=fmt(socios.reduce((a,s)=>a+s.s,0));
+  const all=socios.map((s,i)=>({s,i,t:EC.calcular(s,CFG,corteActual).totalPendiente}));
+  const list=all.filter(x=>(x.s.nombre+x.s.correo).toLowerCase().includes(q)&&(filt==='all'||(filt==='ok'?x.t===0:x.t>0)));
+  $('#a-rows').innerHTML=`<li class="hd"><span>Socio</span><span>Contraseña</span><span>Estado</span><span style="text-align:right">Por pagar</span><span style="text-align:right">Acciones</span></li>`+
+  (list.map(({s,i,t})=>{const [c,tx]=estado(t);return `<li>
+    <div class="who"><span class="av" style="background:${avColors[i%avColors.length]}">${ini(s.nombre)}</span><div style="min-width:0"><b>${esc(s.nombre)}</b><span>${esc(s.correo)}</span></div></div>
+    <div class="pass"><code>${shown.has(i)?esc(s.clave):'••••••••'}</code><button class="mini" data-show="${i}">${shown.has(i)?'Ocultar':'Ver'}</button></div>
+    <div class="stt"><span class="pill ${c}">${tx}</span></div>
+    <div class="money num">${fmt(t)}<small>Corte ${EC.corta(corteActual)}</small></div>
+    <div class="acts"><button class="ibtn up" data-pdfsocio="${i}" title="Descargar estado de cuenta" aria-label="Descargar estado de cuenta de ${esc(s.nombre)}">${svg(ic.dl)}</button><button class="ibtn" data-ed="${i}" title="Editar" aria-label="Editar a ${esc(s.nombre)}">${svg(ic.ed)}</button><button class="ibtn del" data-del="${i}" title="Eliminar" aria-label="Eliminar a ${esc(s.nombre)}">${svg(ic.del)}</button></div></li>`}).join('')||`<li class="empty">No hay socios que coincidan con la búsqueda.</li>`);
+  const ok=all.filter(x=>x.t===0).length;
+  $('#a-n').textContent=socios.length;$('#a-tot').textContent=fmt(all.reduce((a,x)=>a+x.t,0));
   $('#a-ok').textContent=ok+' de '+socios.length;$('#a-meter').style.width=(socios.length?ok/socios.length*100:0)+'%';
 }
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 renderAdmin();$('#a-q').addEventListener('input',renderAdmin);
 
 /* Panel lateral */
@@ -571,35 +600,27 @@ const sheet=$('#sheet'),scrim=$('#scrim');
 function openSheet(h){sheet.innerHTML='<button class="x" data-close aria-label="Cerrar">×</button>'+h;sheet.hidden=scrim.hidden=false;const f=sheet.querySelector('input,select');f&&f.focus()}
 function closeSheet(){sheet.hidden=scrim.hidden=true}
 scrim.addEventListener('click',closeSheet);
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function socioForm(i){const s=i==null?{n:'',m:'',p:''}:socios[i];return `<h2>${i==null?'Nuevo socio':'Editar socio'}</h2><p class="sub">${i==null?'El socio entra con este correo y contraseña.':'Los cambios se guardan cifrados.'}</p>
+function socioForm(i){const s=i==null?{n:'',m:'',p:''}:{n:socios[i].nombre,m:socios[i].correo,p:socios[i].clave};return `<h2>${i==null?'Nuevo socio':'Editar socio'}</h2><p class="sub">${i==null?'El socio entra con este correo y contraseña.':'Los cambios se guardan cifrados.'}</p>
   <form id="f-socio" data-i="${i??''}">
   <div class="field"><label for="u-n">Nombre completo</label><input class="input" id="u-n" value="${esc(s.n)}"></div>
   <div class="field"><label for="u-m">Correo</label><input class="input" id="u-m" type="email" value="${esc(s.m)}"></div>
   <div class="field"><label for="u-p">Contraseña</label><div class="pw"><input class="input" id="u-p" type="text" value="${esc(s.p)}"><button type="button" id="u-gen">Generar</button></div></div>
   <div class="foot"><button type="button" class="btn btn-soft" data-close>Cancelar</button><button class="btn btn-blue">Guardar</button></div></form>`}
-function upForm(i){return `<h2>Subir estado de cuenta</h2><p class="sub">${esc(socios[i].n)}</p>
-  <form id="f-up" data-i="${i}">
-  <div class="row2"><div class="field"><label for="e-mes">Mes</label><select class="input" id="e-mes">${['Octubre','Septiembre','Agosto'].map(m=>`<option>${m}</option>`).join('')}</select></div>
-  <div class="field"><label for="e-anio">Año</label><select class="input" id="e-anio"><option>2026</option><option>2025</option></select></div></div>
-  <div class="field"><label for="e-monto">Saldo</label><input class="input num" id="e-monto" inputmode="decimal" placeholder="₡0.00"></div>
-  <div class="field"><label class="drop" for="e-pdf" id="e-drop"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--rojo)" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M12 18v-6m0 0-3 3m3-3 3 3"/></svg><strong id="e-name">Elegí o arrastrá el PDF</strong></label><input id="e-pdf" type="file" accept="application/pdf" hidden></div>
-  <div class="foot"><button type="button" class="btn btn-soft" data-close>Cancelar</button><button class="btn btn-red">Publicar</button></div></form>`}
-function delForm(i){return `<h2>Eliminar socio</h2><p class="sub">${esc(socios[i].n)}</p><div class="confirm">Se borran su acceso y todos sus estados de cuenta. Esto no se puede deshacer.</div>
+function delForm(i){return `<h2>Eliminar socio</h2><p class="sub">${esc(socios[i].nombre)}</p><div class="confirm">Se borran su acceso y todos sus estados de cuenta. Esto no se puede deshacer.</div>
   <div class="foot"><button type="button" class="btn btn-soft" data-close>Cancelar</button><button class="btn btn-red" data-delok="${i}">Eliminar</button></div>`}
 
 document.addEventListener('click',e=>{
   const t=e.target.closest('button');if(!t)return;
   if(t.dataset.go)show(t.dataset.go);
   if(t.dataset.peek){const inp=document.getElementById(t.dataset.peek),v=inp.type==='password';inp.type=v?'text':'password';t.textContent=v?'Ocultar':'Mostrar'}
-  if(t.dataset.pdf)toast('En la web real aquí se descarga el PDF de '+t.dataset.pdf);
+  if(t.dataset.pdf)descargar(yo,t.dataset.pdf==='actual'?corteActual:t.dataset.pdf,t);
+  if(t.dataset.pdfsocio)descargar(socios[+t.dataset.pdfsocio],corteActual,t);
   if(t.dataset.show){const i=+t.dataset.show;shown.has(i)?shown.delete(i):shown.add(i);renderAdmin()}
   if(t.dataset.f){filt=t.dataset.f;$$('.seg button').forEach(b=>b.setAttribute('aria-pressed',b===t));renderAdmin()}
   if(t.id==='a-new')openSheet(socioForm(null));
   if(t.dataset.ed)openSheet(socioForm(+t.dataset.ed));
-  if(t.dataset.up)openSheet(upForm(+t.dataset.up));
   if(t.dataset.del)openSheet(delForm(+t.dataset.del));
-  if(t.dataset.delok){const n=socios[+t.dataset.delok].n;socios.splice(+t.dataset.delok,1);shown.clear();closeSheet();renderAdmin();toast(n+' fue eliminado')}
+  if(t.dataset.delok){const n=socios[+t.dataset.delok].nombre;socios.splice(+t.dataset.delok,1);shown.clear();closeSheet();renderAdmin();toast(n+' fue eliminado')}
   if(t.hasAttribute('data-close'))closeSheet();
   if(t.id==='u-gen'){const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789#$%';let p='';crypto.getRandomValues(new Uint32Array(12)).forEach(x=>p+=c[x%c.length]);$('#u-p').value=p}
   if(t.id==='notice-ok')$('#notice').hidden=true;
@@ -608,11 +629,8 @@ document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;
   if(f.id==='f-login'){show('socio');return}
   if(f.id==='f-socio'){const n=$('#u-n').value.trim(),m=$('#u-m').value.trim(),p=$('#u-p').value;
     if(!n||!m||!p){toast('Completá nombre, correo y contraseña');return}
-    if(f.dataset.i===''){socios.push({n,m,p,per:'Sin estados',s:0});toast('Socio creado')}else{Object.assign(socios[+f.dataset.i],{n,m,p});toast('Cambios guardados')}
+    if(f.dataset.i===''){socios.push({nombre:n,correo:m,clave:p,cuotas:{},sesiones:{},otras:[],observaciones:''});toast('Socio creado')}else{Object.assign(socios[+f.dataset.i],{nombre:n,correo:m,clave:p});toast('Cambios guardados')}
     closeSheet();renderAdmin()}
-  if(f.id==='f-up'){const v=parseFloat(($('#e-monto').value||'').replace(/[₡,\s]/g,''));
-    if(isNaN(v)){toast('Escribí el saldo, por ejemplo 47,500.00');return}
-    const s=socios[+f.dataset.i];s.s=v;s.per=$('#e-mes').value+' '+$('#e-anio').value;closeSheet();renderAdmin();toast('Estado de '+s.per+' publicado para '+s.n.split(' ')[0])}
 });
 document.addEventListener('change',e=>{if(e.target.id==='e-pdf'&&e.target.files[0])$('#e-name').textContent=e.target.files[0].name});
 document.addEventListener('focusout',e=>{if(e.target.id==='e-monto'){const v=parseFloat(e.target.value.replace(/[₡,\s]/g,''));if(!isNaN(v))e.target.value=fmt(v)}});
@@ -626,7 +644,7 @@ let tt;function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;t.st
 function show(v){['login','socio','admin'].forEach(k=>$('#v-'+k).hidden=k!==v);
   $$('.demo button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.go===v));
   $('#h-title').textContent=v==='admin'?'Administración':'Estados de cuenta';
-  $('#h-user').innerHTML=v==='login'?'':`<button class="chip" data-go="login"><span class="avatar">${v==='admin'?'DS':'MR'}</span><span class="lbl">Cerrar sesión</span></button>`;
+  $('#h-user').innerHTML=v==='login'?'':`<button class="chip" data-go="login"><span class="avatar">DS</span><span class="lbl">Cerrar sesión</span></button>`;
   closeSheet();scrollTo(0,0);if(v==='socio')countUp($('#s-amount'));
   $$('.rv').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});
   requestAnimationFrame(sizeDots)}
