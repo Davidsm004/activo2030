@@ -305,6 +305,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .sumbar{padding-left:76px}
   .lista .tools{position:static}
 }
+.mt{flex-wrap:wrap}.mt select.medio{min-width:7.5em}
+.mt select.medio:invalid,.mt select.medio.falta{border-color:var(--rojo)}
+.ok-panel{margin-top:18px;padding:clamp(20px,3vw,28px);display:flex;gap:18px;align-items:center;flex-wrap:wrap;border-color:var(--ok);border-width:2px}
+.ok-panel .ic{flex:none;width:52px;height:52px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:grid;place-items:center}
+.ok-panel .tx{flex:1;min-width:200px}.ok-panel h3{font-size:1.15rem}.ok-panel p{color:var(--muted);font-size:.9375rem;margin-top:2px}
+.ok-panel .bt{display:flex;gap:10px;flex-wrap:wrap}
+.manual-banner{display:flex;gap:10px;align-items:center;background:var(--warn-bg);color:var(--warn);border-radius:14px;padding:10px 14px;font-weight:700;font-size:.875rem;margin-bottom:16px}
+.s-actions{margin-top:16px}
 /* Panel lateral */
 .scrim{position:fixed;inset:0;background:rgba(0,10,71,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:20}
 .sheet{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--surface);z-index:21;overflow:auto;
@@ -468,7 +476,7 @@ footer img{width:34px;height:34px}
   <section class="band">
     <canvas data-dots></canvas>
     <div class="saw" aria-hidden="true" style="width:520px;height:520px;right:-160px;top:-170px"><svg><use href="#saw"/></svg></div>
-    <div class="wrap s-hero"><span class="eyebrow rv">Hola de nuevo</span><h1 class="rv d1" id="s-nombre"></h1><p class="s-sub rv d2" id="s-sub"></p></div>
+    <div class="wrap s-hero"><span class="eyebrow rv">Hola de nuevo</span><h1 class="rv d1" id="s-nombre"></h1><p class="s-sub rv d2" id="s-sub"></p><div class="s-actions rv d3"><button type="button" class="btn btn-yellow" data-go="macero" style="padding:.6rem 1.2rem">Soy Macero · pasar lista</button></div></div>
   </section>
   <div class="wrap lift">
     <div class="card saldo rv d1">
@@ -523,6 +531,7 @@ footer img{width:34px;height:34px}
           <button aria-pressed="true" data-f="all">Todos</button><button aria-pressed="false" data-f="ok">Al día</button><button aria-pressed="false" data-f="pend">Con saldo</button>
         </div>
         <input class="search" id="a-q" type="search" placeholder="Buscar socio" aria-label="Buscar socio por nombre o correo">
+        <button class="btn btn-soft" id="a-manual" style="padding:.6rem 1.1rem">Registrar asistencia</button>
         <button class="btn btn-blue" id="a-new" style="padding:.6rem 1.1rem">+ Nuevo socio</button>
       </div>
       <ul class="list" id="a-rows"></ul>
@@ -543,6 +552,7 @@ footer img{width:34px;height:34px}
   </section>
   <div class="wrap lift">
     <form class="card ses rv d1" id="f-macero" novalidate>
+      <div class="manual-banner" id="mc-manual" hidden>Registro manual del administrador</div>
       <div class="ses-h"><h2>Datos de la sesión</h2><span class="pill" id="mc-estado"></span></div>
       <div class="fgrid">
         <div class="field wide"><label for="mc-macero">Macero en turno</label><select class="input" id="mc-macero"></select></div>
@@ -571,9 +581,18 @@ footer img{width:34px;height:34px}
       </div>
     </div>
 
+    <div class="card ok-panel" id="mc-ok" hidden>
+      <div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="m5 12 5 5L20 7"/></svg></div>
+      <div class="tx"><h3 id="mc-ok-t"></h3><p id="mc-ok-d"></p></div>
+      <div class="bt">
+        <button type="button" class="btn btn-red" id="mc-pdf"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>Descargar archivo de asistencia</button>
+        <button type="button" class="btn btn-blue" id="mc-mail"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>Enviar por correo</button>
+      </div>
+    </div>
+
     <div class="card sumbar">
       <div class="cts num" id="mc-cts"></div>
-      <button type="button" class="btn btn-red" id="mc-guardar">Guardar asistencia</button>
+      <button type="button" class="btn btn-red" id="mc-guardar">Enviar registro</button>
     </div>
 
     <div class="card" style="margin-top:22px">
@@ -677,7 +696,7 @@ renderSocio();setInterval(()=>tick(),60000);
 /* PDF: las librerías se cargan la primera vez que alguien descarga */
 let libs=null;
 function cargarLibs(){if(libs)return libs;
-  libs=['lib/jspdf.umd.min.js','lib/jspdf.plugin.autotable.min.js','lib/fuentes-pdf.js'].reduce((p,src)=>p.then(()=>new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>ko(new Error(src));document.head.appendChild(s)})),Promise.resolve());
+  libs=['lib/jspdf.umd.min.js','lib/jspdf.plugin.autotable.min.js','lib/fuentes-pdf.js','lib/asistencia-pdf.js'].reduce((p,src)=>p.then(()=>new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>ko(new Error(src));document.head.appendChild(s)})),Promise.resolve());
   return libs}
 async function descargar(socio,corte,btn){
   btn&&btn.setAttribute('aria-busy','true');toast('Generando el estado de cuenta…');
@@ -708,20 +727,21 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 renderAdmin();$('#a-q').addEventListener('input',renderAdmin);
 
 /* ---------- Soy Macero ---------- */
-const SESIONES={};          // sesiones registradas por el macero: n -> registro
+const SESIONES={};
+let modoManual=false, ultimoGuardado=null;          // sesiones registradas por el macero: n -> registro
 const usuarioActual=0;      // quien inició sesión (en la propuesta, David)
 let mc=null;
 const numDe=v=>{const x=parseFloat(String(v||'').replace(/[₡$,\s]/g,''));return isNaN(x)?NaN:x};
 const fmt2=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtUSD=n=>'US$'+fmt2(n);
 function nuevaSesion(n){
-  return {n, macero:usuarioActual, fecha:hoyISO, hora:'19:00', conv:'1', extra:false, tc:'',
-    campos:[], filas:socios.map((s,i)=>({tipo:'socio',i,nombre:s.nombre,estado:null,moneda:'CRC',monto:fmt2(CFG.maceriaMinima),extras:{}}))}
+  return {n, manual:modoManual, macero:usuarioActual, fecha:hoyISO, hora:'19:00', conv:'1', extra:false, tc:'',
+    campos:[], filas:socios.map((s,i)=>({tipo:'socio',i,nombre:s.nombre,estado:null,medio:'',moneda:'CRC',monto:fmt2(CFG.maceriaMinima),extras:{}}))}
 }
 function primeraLibre(){for(let n=CFG.sesionInicial;n<=CFG.sesionFinal;n++){if(!SESIONES[n]&&!socios.some(s=>s.sesiones&&s.sesiones[n]))return n}return CFG.sesionFinal}
 function cargarSesion(n){mc=SESIONES[n]?JSON.parse(JSON.stringify(SESIONES[n])):nuevaSesion(n);
   // socios nuevos que no estaban en el registro
-  socios.forEach((s,i)=>{if(!mc.filas.some(f=>f.tipo==='socio'&&f.i===i))mc.filas.push({tipo:'socio',i,nombre:s.nombre,estado:null,moneda:'CRC',monto:fmt2(CFG.maceriaMinima),extras:{}})});
+  socios.forEach((s,i)=>{if(!mc.filas.some(f=>f.tipo==='socio'&&f.i===i))mc.filas.push({tipo:'socio',i,nombre:s.nombre,estado:null,medio:'',moneda:'CRC',monto:fmt2(CFG.maceriaMinima),extras:{}})});
   renderMacero()}
 function renderMacero(){
   $('#mc-macero').innerHTML=socios.map((s,i)=>`<option value="${i}" ${+mc.macero===i?'selected':''}>${esc(s.nombre)}${i===usuarioActual?' (vos)':''}</option>`).join('');
@@ -730,7 +750,7 @@ function renderMacero(){
   $('#mc-fecha').value=mc.fecha;$('#mc-hora').value=mc.hora;
   $$('#mc-conv button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.conv===mc.conv));
   $$('#mc-tipo button').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.tipo==='1')===mc.extra));
-  $('#mc-tc').value=mc.tc;
+  $('#mc-tc').value=mc.tc;$('#mc-manual').hidden=!mc.manual;$('#mc-ok').hidden=ultimoGuardado!==mc.n;
   const yaReg=!!SESIONES[mc.n]||socios.some(s=>s.sesiones&&s.sesiones[mc.n]);
   $('#mc-estado').className='pill '+(yaReg?'ok':'warn');$('#mc-estado').textContent=yaReg?'Registrada · podés editarla':'Nueva';
   $('#mc-campos').innerHTML=mc.campos.length?'<span>Campos adicionales:</span>'+mc.campos.map((c,k)=>`<span class="campo-tag"><input value="${esc(c)}" data-campo="${k}" aria-label="Nombre del campo ${k+1}"><button type="button" data-delcampo="${k}" aria-label="Quitar campo ${esc(c)}">×</button></span>`).join(''):'<span>Sin campos adicionales. Agregá uno para anotar, por ejemplo, el medio de pago o una observación.</span>';
@@ -742,7 +762,7 @@ function renderFilas(){
     if(q&&!(f.nombre||'').toLowerCase().includes(q))return '';
     const st=['A','J','I'].map(v=>`<button type="button" data-st="${k}" data-v="${v}" aria-pressed="${f.estado===v}">${v==='A'?'Presente':v==='J'?'Justificada':'Injustificada'}</button>`).join('');
     let monto='';
-    if(f.estado==='A')monto=`<div class="mt"><select class="input" data-mon="${k}" aria-label="Moneda"><option value="CRC" ${f.moneda==='CRC'?'selected':''}>₡</option><option value="USD" ${f.moneda==='USD'?'selected':''}>US$</option></select><input class="input num" data-monto="${k}" inputmode="decimal" value="${esc(f.monto)}" aria-label="Monto pagado por ${esc(f.nombre||'compañero')}"></div>`;
+    if(f.estado==='A')monto=`<div class="mt"><select class="input medio${f.falta?' falta':''}" data-medio="${k}" aria-label="Medio de pago"><option value="" ${!f.medio?'selected':''}>Medio…</option><option value="SINPE" ${f.medio==='SINPE'?'selected':''}>SINPE</option><option value="Efectivo" ${f.medio==='Efectivo'?'selected':''}>Efectivo</option></select><select class="input" data-mon="${k}" aria-label="Moneda"><option value="CRC" ${f.moneda==='CRC'?'selected':''}>₡</option><option value="USD" ${f.moneda==='USD'?'selected':''}>US$</option></select><input class="input num" data-monto="${k}" inputmode="decimal" value="${esc(f.monto)}" aria-label="Monto pagado por ${esc(f.nombre||'compañero')}"></div>`;
     else if(f.estado)monto=`<div class="cargo num">${mc.extra?'No se cobra':'Cargo '+fmt(cargoDe(f))}<small>${f.estado==='J'?'Inasistencia justificada':'Inasistencia injustificada'}</small></div>`;
     else monto='<div class="cargo"><small>Marcá la asistencia</small></div>';
     const nm=f.tipo==='socio'?`<span class="av" style="display:grid;width:34px;height:34px;border-radius:50%;place-items:center;color:#fff;font-weight:900;font-size:.75rem;background:${avColors[f.i%avColors.length]};flex:none">${ini(f.nombre)}</span><b>${esc(f.nombre)}</b>`
@@ -751,15 +771,17 @@ function renderFilas(){
     return `<div class="ar ${f.estado?'':'sin'}"><div class="nm">${nm}</div><div class="st" role="group" aria-label="Asistencia">${st}</div>${monto}${f.tipo==='manual'?`<button type="button" class="x" data-delfila="${k}" aria-label="Quitar fila">×</button>`:'<span></span>'}${extras}</div>`}).join('')||'<p class="empty">No hay compañeros que coincidan con la búsqueda.</p>';
 }
 function resumenMacero(){
-  const c={A:0,J:0,I:0,N:0};let crc=0,usd=0,cargos=0;
-  mc.filas.forEach(f=>{c[f.estado||'N']++;if(f.estado==='A'){const v=numDe(f.monto);if(!isNaN(v))f.moneda==='USD'?usd+=v:crc+=v}else if(f.estado)cargos+=cargoDe(f)});
+  const c={A:0,J:0,I:0,N:0};let crc=0,usd=0,cargos=0,sinpe=0,efe=0;
+  mc.filas.forEach(f=>{c[f.estado||'N']++;if(f.estado==='A'){const v=numDe(f.monto);if(!isNaN(v)){f.moneda==='USD'?usd+=v:crc+=v;if(f.moneda==='CRC'){if(f.medio==='SINPE')sinpe+=v;if(f.medio==='Efectivo')efe+=v}}}else if(f.estado)cargos+=cargoDe(f)});
   const hayUSD=mc.filas.some(f=>f.estado==='A'&&f.moneda==='USD');$('#mc-tc-box').hidden=!hayUSD;
-  $('#mc-cts').innerHTML=`<span><i class="dot" style="background:var(--ok)"></i><b>${c.A}</b> presentes</span><span><i class="dot" style="background:#c98a00"></i><b>${c.J}</b> justificadas</span><span><i class="dot" style="background:var(--rojo)"></i><b>${c.I}</b> injustificadas</span>${c.N?`<span><i class="dot" style="background:var(--line)"></i><b>${c.N}</b> sin marcar</span>`:''}<span class="tot">Recaudado ${fmt(crc)}${usd?' + '+fmtUSD(usd):''} · Cargos ${fmt(cargos)}</span>`}
+  $('#mc-cts').innerHTML=`<span><i class="dot" style="background:var(--ok)"></i><b>${c.A}</b> presentes</span><span><i class="dot" style="background:#c98a00"></i><b>${c.J}</b> justificadas</span><span><i class="dot" style="background:var(--rojo)"></i><b>${c.I}</b> injustificadas</span>${c.N?`<span><i class="dot" style="background:var(--line)"></i><b>${c.N}</b> sin marcar</span>`:''}<span class="tot">Recaudado ${fmt(crc)}${usd?' + '+fmtUSD(usd):''} (SINPE ${fmt(sinpe)} · Efectivo ${fmt(efe)}) · Cargos ${fmt(cargos)}</span>`}
 function guardarMacero(){
   if(!mc.fecha){toast('Elegí la fecha de la sesión');return}
   if(!mc.hora){toast('Indicá la hora de inicio');return}
   const sinNombre=mc.filas.find(f=>f.tipo==='manual'&&!f.nombre.trim());if(sinNombre){toast('Escribí el nombre del compañero agregado o quitá la fila');return}
   const sin=mc.filas.filter(f=>!f.estado);if(sin.length){toast('Faltan '+sin.length+' compañeros por marcar');return}
+  mc.filas.forEach(f=>f.falta=f.estado==='A'&&!f.medio);const sinMedio=mc.filas.filter(f=>f.falta);
+  if(sinMedio.length){renderFilas();toast('Elegí SINPE o Efectivo para '+(sinMedio.length===1?(sinMedio[0].nombre||'un compañero'):sinMedio.length+' compañeros'));return}
   const malo=mc.filas.find(f=>f.estado==='A'&&(isNaN(numDe(f.monto))||numDe(f.monto)<0));if(malo){toast('Revisá el monto de '+(malo.nombre||'un compañero'));return}
   const hayUSD=mc.filas.some(f=>f.estado==='A'&&f.moneda==='USD');const tc=numDe(mc.tc);
   if(hayUSD&&!(tc>0)){toast('Indicá el tipo de cambio para los pagos en dólares');$('#mc-tc').focus();return}
@@ -772,16 +794,49 @@ function guardarMacero(){
     socios[f.i].sesiones=socios[f.i].sesiones||{};
     socios[f.i].sesiones[mc.n]={fecha:mc.fecha,extraordinaria:mc.extra,asistencia:f.estado,
       cargo:mc.extra?0:f.estado==='A'?CFG.maceriaMinima:cargoDe(f),
-      monto:crcV,fechaPago:crcV>0?mc.fecha:'',medio:crcV>0?(f.moneda==='USD'?'Dólares':'Colones'):'',obs};
+      monto:crcV,fechaPago:crcV>0?mc.fecha:'',medio:crcV>0?f.medio:'',obs};
   });
-  SESIONES[mc.n]=JSON.parse(JSON.stringify(mc));
+  mc.tcNum=hayUSD?tc:0;mc.registrado=new Date().toISOString();
+  SESIONES[mc.n]=JSON.parse(JSON.stringify(mc));ultimoGuardado=mc.n;
   const p=mc.filas.filter(f=>f.estado==='A').length;
-  toast(`Sesión ${mc.n} guardada: ${p} presentes. Ya se aplicó a los estados de cuenta.`);
-  renderSocio();renderAdmin();renderRegs();renderMacero()}
+  renderSocio();renderAdmin();renderRegs();renderMacero();
+  $('#mc-ok-t').textContent=`Sesión ${mc.n} registrada`;
+  $('#mc-ok-d').textContent=`${p} presentes. Ya se aplicó a los estados de cuenta. Descargá o enviá el archivo de asistencia.`;
+  $('#mc-ok').scrollIntoView({behavior:still()?'auto':'smooth',block:'center'});toast('Registro enviado')}
+function datosAsistencia(n){
+  const r=SESIONES[n],tc=r.tcNum||0;const t={A:0,J:0,I:0,sinpe:0,efectivo:0,total:0,cargos:0,usd:0};
+  const filas=r.filas.map(f=>{const v=f.estado==='A'?numDe(f.monto)||0:0,crcV=f.moneda==='USD'?Math.round(v*tc*100)/100:v,cargo=f.estado==='A'||r.extra?0:f.estado==='J'?CFG.inasistenciaJustificada:CFG.inasistenciaInjustificada;
+    t[f.estado]++;if(f.estado==='A'){t.total+=crcV;if(f.medio==='SINPE')t.sinpe+=crcV;else t.efectivo+=crcV;if(f.moneda==='USD')t.usd+=v}t.cargos+=cargo;
+    return {nombre:f.nombre,agregado:f.tipo==='manual',estado:f.estado,medio:f.medio,moneda:f.moneda,monto:v,montoCRC:crcV,cargo,extras:f.extras}});
+  const gen=new Date(r.registrado||Date.now());
+  return {n,fechaLarga:EC.larga(r.fecha),fechaCorta:EC.corta(r.fecha),hora:r.hora,conv:r.conv==='1'?'Primera convocatoria':'Segunda convocatoria',extraordinaria:r.extra,
+    macero:socios[+r.macero]?socios[+r.macero].nombre:'',registradoPor:r.manual?'Administrador (registro manual)':(socios[+r.macero]?socios[+r.macero].nombre:''),tc,
+    campos:r.campos.map((c,j)=>c||'Campo '+(j+1)),filas,totales:t,
+    generado:EC.larga(gen.getFullYear()+'-'+String(gen.getMonth()+1).padStart(2,'0')+'-'+String(gen.getDate()).padStart(2,'0'))+' '+gen.toTimeString().slice(0,5)}}
+async function pdfAsistencia(n){await cargarLibs();return AsistenciaPDF.generar(datosAsistencia(n),CFG,$('.head img').src)}
+async function descargarAsistencia(n,btn){btn&&btn.setAttribute('aria-busy','true');
+  try{const r=await pdfAsistencia(n);r.doc.save(r.archivo);toast('Listo: '+r.archivo)}catch(e){libs=null;toast('No se pudo generar el PDF. Revisá tu conexión e intentá de nuevo.')}finally{btn&&btn.removeAttribute('aria-busy')}}
+function correoForm(n){const r=SESIONES[n],m=socios[+r.macero];const para=[m&&m.correo,socios[0].correo].filter((x,i,a)=>x&&a.indexOf(x)===i).join(', ');
+  return `<h2>Enviar por correo</h2><p class="sub">Archivo de asistencia de la sesión ${n}</p>
+  <form id="f-mail" data-n="${n}">
+  <div class="field"><label for="ml-para">Para</label><input class="input" id="ml-para" value="${esc(para)}" placeholder="correo@ejemplo.com, otro@ejemplo.com"></div>
+  <div class="field"><label for="ml-msg">Mensaje</label><textarea class="input" id="ml-msg" rows="4">Adjunto el registro de asistencia de la sesión ${n} del ${EC.larga(r.fecha)}.</textarea></div>
+  <div class="secure" style="margin:0 0 14px"><span>En el celular se abre tu app de correo con el PDF adjunto. En la computadora se descarga el PDF y se abre tu correo con el mensaje listo para adjuntarlo.</span></div>
+  <div class="foot"><button type="button" class="btn btn-soft" data-close>Cancelar</button><button class="btn btn-blue">Enviar</button></div></form>`}
+async function enviarAsistencia(n,para,msg,btn){
+  btn&&btn.setAttribute('aria-busy','true');
+  try{const r=await pdfAsistencia(n),asunto='Registro de asistencia · Sesión '+n;
+    const blob=r.doc.output('blob'),file=new File([blob],r.archivo,{type:'application/pdf'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file],title:asunto,text:msg});closeSheet();toast('Archivo compartido');return}catch(e){if(e&&e.name==='AbortError')return}}
+    r.doc.save(r.archivo);closeSheet();
+    location.href='mailto:'+encodeURIComponent(para).replace(/%2C/g,',').replace(/%40/g,'@')+'?subject='+encodeURIComponent(asunto)+'&body='+encodeURIComponent(msg+'\n\n(Adjuntá el archivo '+r.archivo+' que se acaba de descargar.)');
+    toast('Se descargó '+r.archivo+'. Adjuntalo en el correo que se abrió.')}
+  catch(e){libs=null;toast('No se pudo preparar el correo. Intentá de nuevo.')}finally{btn&&btn.removeAttribute('aria-busy')}}
 function renderRegs(){
   const ns=Object.keys(SESIONES).map(Number).sort((a,b)=>b-a);
   $('#mc-regs').innerHTML=ns.length?ns.map(n=>{const r=SESIONES[n],p=r.filas.filter(f=>f.estado==='A').length;
-    return `<li><div><div class="t">Sesión ${n}${r.extra?' · extraordinaria':''}</div><div class="d">${EC.larga(r.fecha)} · ${r.hora} · ${r.conv==='1'?'primera':'segunda'} convocatoria · ${p} presentes · macero ${esc(socios[+r.macero]?socios[+r.macero].nombre:'')}</div></div><button type="button" class="mini" data-editses="${n}">Editar</button></li>`}).join('')
+    return `<li><div><div class="t">Sesión ${n}${r.extra?' · extraordinaria':''}</div><div class="d">${EC.larga(r.fecha)} · ${r.hora} · ${r.conv==='1'?'primera':'segunda'} convocatoria · ${p} presentes · macero ${esc(socios[+r.macero]?socios[+r.macero].nombre:'')}</div></div><div style="display:flex;gap:6px"><button type="button" class="mini" data-pdfses="${n}">PDF</button><button type="button" class="mini" data-editses="${n}">Editar</button></div></li>`}).join('')
     :'<li class="empty" style="display:block">Todavía no hay sesiones registradas desde esta pantalla.</li>'}
 cargarSesion(primeraLibre());renderRegs();
 const vm=$('#v-macero');
@@ -790,12 +845,15 @@ vm.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.conv){mc.conv=b.dataset.conv;$$('#mc-conv button').forEach(x=>x.setAttribute('aria-pressed',x===b))}
   if(b.dataset.tipo){mc.extra=b.dataset.tipo==='1';$$('#mc-tipo button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderFilas();resumenMacero()}
   if(b.id==='mc-todos'){mc.filas.forEach(f=>{if(!f.estado)f.estado='A'});renderFilas();resumenMacero()}
-  if(b.id==='mc-addrow'){mc.filas.push({tipo:'manual',nombre:'',estado:null,moneda:'CRC',monto:fmt2(CFG.maceriaMinima),extras:{}});renderFilas();resumenMacero();const ins=$$('[data-nombre]');ins[ins.length-1]&&ins[ins.length-1].focus()}
+  if(b.id==='mc-addrow'){mc.filas.push({tipo:'manual',nombre:'',estado:null,medio:'',moneda:'CRC',monto:fmt2(CFG.maceriaMinima),extras:{}});renderFilas();resumenMacero();const ins=$$('[data-nombre]');ins[ins.length-1]&&ins[ins.length-1].focus()}
   if(b.id==='mc-addcampo'){mc.campos.push('Campo '+(mc.campos.length+1));renderMacero();const ins=$$('[data-campo]');const last=ins[ins.length-1];if(last){last.focus();last.select()}}
   if(b.dataset.delcampo!==undefined){const j=+b.dataset.delcampo;mc.campos.splice(j,1);mc.filas.forEach(f=>{const nx={};Object.keys(f.extras).forEach(k=>{k=+k;if(k<j)nx[k]=f.extras[k];else if(k>j)nx[k-1]=f.extras[k]});f.extras=nx});renderMacero()}
   if(b.dataset.delfila!==undefined){mc.filas.splice(+b.dataset.delfila,1);renderFilas();resumenMacero()}
-  if(b.dataset.editses){cargarSesion(+b.dataset.editses);scrollTo({top:0,behavior:still()?'auto':'smooth'})}
+  if(b.dataset.editses){ultimoGuardado=null;cargarSesion(+b.dataset.editses);scrollTo({top:0,behavior:still()?'auto':'smooth'})}
   if(b.id==='mc-guardar')guardarMacero();
+  if(b.id==='mc-pdf'&&ultimoGuardado)descargarAsistencia(ultimoGuardado,b);
+  if(b.id==='mc-mail'&&ultimoGuardado)openSheet(correoForm(ultimoGuardado));
+  if(b.dataset.pdfses)descargarAsistencia(+b.dataset.pdfses,b);
 });
 vm.addEventListener('input',e=>{const t=e.target;
   if(t.dataset.monto!==undefined){mc.filas[+t.dataset.monto].monto=t.value;resumenMacero()}
@@ -805,8 +863,9 @@ vm.addEventListener('input',e=>{const t=e.target;
   if(t.id==='mc-fecha')mc.fecha=t.value;if(t.id==='mc-hora')mc.hora=t.value;if(t.id==='mc-tc')mc.tc=t.value;
   if(t.id==='mc-q')renderFilas()});
 vm.addEventListener('change',e=>{const t=e.target;
-  if(t.id==='mc-sesion')cargarSesion(+t.value);
+  if(t.id==='mc-sesion'){ultimoGuardado=null;cargarSesion(+t.value)}
   if(t.id==='mc-macero')mc.macero=+t.value;
+  if(t.dataset.medio!==undefined){const f=mc.filas[+t.dataset.medio];f.medio=t.value;f.falta=false;t.classList.remove('falta');resumenMacero()}
   if(t.dataset.mon!==undefined){mc.filas[+t.dataset.mon].moneda=t.value;resumenMacero()}});
 vm.addEventListener('focusout',e=>{const t=e.target;if(t.dataset.monto!==undefined||t.id==='mc-tc'){const v=numDe(t.value);if(!isNaN(v)){t.value=fmt2(v);if(t.id==='mc-tc')mc.tc=t.value;else mc.filas[+t.dataset.monto].monto=t.value}}});
 
@@ -833,6 +892,8 @@ document.addEventListener('click',e=>{
   if(t.dataset.show){const i=+t.dataset.show;shown.has(i)?shown.delete(i):shown.add(i);renderAdmin()}
   if(t.dataset.f){filt=t.dataset.f;$$('.seg button').forEach(b=>b.setAttribute('aria-pressed',b===t));renderAdmin()}
   if(t.id==='a-new')openSheet(socioForm(null));
+  if(t.id==='a-manual'){modoManual=true;ultimoGuardado=null;show('macero');cargarSesion(primeraLibre())}
+  if(t.dataset.go==='macero'&&!t.closest('#v-admin')&&modoManual){modoManual=false;ultimoGuardado=null;cargarSesion(primeraLibre())}
   if(t.dataset.ed)openSheet(socioForm(+t.dataset.ed));
   if(t.dataset.del)openSheet(delForm(+t.dataset.del));
   if(t.dataset.delok){const n=socios[+t.dataset.delok].nombre;socios.splice(+t.dataset.delok,1);shown.clear();closeSheet();renderAdmin();toast(n+' fue eliminado')}
@@ -842,6 +903,8 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;
   if(f.id==='f-login'){show('socio');return}
+  if(f.id==='f-mail'){const para=$('#ml-para').value.trim();if(!/^[^\s@,]+@[^\s@,]+\.[^\s@,]+(\s*,\s*[^\s@,]+@[^\s@,]+\.[^\s@,]+)*$/.test(para)){toast('Revisá los correos: separalos con coma');return}
+    enviarAsistencia(+f.dataset.n,para,$('#ml-msg').value,f.querySelector('.btn-blue'));return}
   if(f.id==='f-socio'){const n=$('#u-n').value.trim(),m=$('#u-m').value.trim(),p=$('#u-p').value;
     if(!n||!m||!p){toast('Completá nombre, correo y contraseña');return}
     if(f.dataset.i===''){socios.push({nombre:n,correo:m,clave:p,cuotas:{},sesiones:{},otras:[],observaciones:''});toast('Socio creado')}else{Object.assign(socios[+f.dataset.i],{nombre:n,correo:m,clave:p});toast('Cambios guardados')}
