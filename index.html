@@ -313,15 +313,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ok-panel .bt{display:flex;gap:10px;flex-wrap:wrap}
 .manual-banner{display:flex;gap:10px;align-items:center;background:var(--warn-bg);color:var(--warn);border-radius:14px;padding:10px 14px;font-weight:700;font-size:.875rem;margin-bottom:16px}
 .s-actions{margin-top:16px}
-/* Inicio de sesión sobre fondo blanco */
-.band.light{background:#ffffff;color:#0d1238;border-bottom:1px solid #e3e6f2}
-.band.light .saw{opacity:.2}
-.band.light .hero .eyebrow{color:#da291c}.band.light .hero .eyebrow::before{background:#da291c}
-.band.light .hero h1 em{color:#001489}
-.band.light .hero .lead{opacity:1;color:#4a5072}
-.band.light .badge{background:#f2f3f9;border-color:#dfe2ef;color:#0d1238}
-.band.light .badge svg{color:#da291c}
-.band.light .login-card{background:#ffffff;color:#0d1238;border-color:#dfe2ef;box-shadow:0 1px 2px rgba(0,10,71,.06),0 24px 60px -24px rgba(0,10,71,.35)}
 /* Panel lateral */
 .scrim{position:fixed;inset:0;background:rgba(0,10,71,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:20}
 .sheet{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--surface);z-index:21;overflow:auto;
@@ -421,7 +412,7 @@ footer img{width:34px;height:34px}
 
 <!-- ============ LOGIN ============ -->
 <main id="v-login">
-  <section class="band light">
+  <section class="band">
     <canvas data-dots></canvas>
     <div class="saw" aria-hidden="true" style="width:620px;height:620px;right:-170px;top:-190px"><svg><use href="#saw"/></svg></div>
     <div class="wrap hero">
@@ -938,15 +929,15 @@ function show(v){['login','socio','admin','macero'].forEach(k=>$('#v-'+k).hidden
 
 /* Semitono animado en la banda */
 let canv=[];
-function sizeDots(){canv=[...$$('canvas[data-dots]')].filter(c=>c.offsetParent!==null).map(c=>{const light=c.parentNode.classList.contains('light');const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);c.width=r.width*d;c.height=r.height*d;const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);return {c,x,w:r.width,h:r.height,light}});draw(performance.now())}
-function draw(t){canv.forEach(({x,w,h,light})=>{x.clearRect(0,0,w,h);const g=20,tt=t/1000;
+function sizeDots(){canv=[...$$('canvas[data-dots]')].filter(c=>c.offsetParent!==null).map(c=>{const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);c.width=r.width*d;c.height=r.height*d;const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);return {c,x,w:r.width,h:r.height}});draw(performance.now())}
+function draw(t){canv.forEach(({x,w,h})=>{x.clearRect(0,0,w,h);const g=20,tt=t/1000;
   for(let yy=g/2;yy<h;yy+=g)for(let xx=g/2;xx<w;xx+=g){
     const fx=xx/w,fy=yy/h,dist=Math.hypot(fx-.92,(fy+.1)*.9);
     let s=Math.max(0,1-dist*1.25);if(s<=0)continue;
     s*=.75+.25*Math.sin(tt*1.1+xx*.035+yy*.02);
     const rr=s*4.2;if(rr<.35)continue;
     const hash=(Math.sin(xx*12.9898+yy*78.233)*43758.5453)%1;
-    x.fillStyle=hash>.9?'rgba(254,221,0,.95)':hash<-.94?'rgba(218,41,28,.85)':light?'rgba(0,20,137,'+(.08+s*.22)+')':'rgba(255,255,255,'+(.12+s*.25)+')';
+    x.fillStyle=hash>.9?'rgba(254,221,0,.9)':hash<-.94?'rgba(218,41,28,.85)':'rgba(255,255,255,'+(.12+s*.25)+')';
     x.beginPath();x.arc(xx,yy,rr,0,6.283);x.fill()}})}
 (function loop(t){if(!still())draw(t);requestAnimationFrame(loop)})(0);
 addEventListener('resize',sizeDots);sizeDots();
