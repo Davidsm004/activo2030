@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#000a47">
 <style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 <style id="antiframe">html{display:none!important}</style>
 <script>
@@ -32,6 +32,14 @@
   --f-display:"Lato","Helvetica Neue",Arial,sans-serif; --f-body:"Lato","Helvetica Neue",Arial,sans-serif;
   --scale:1; --r:20px; --shadow:0 1px 2px rgba(0,10,71,.06),0 18px 44px -18px rgba(0,10,71,.28);
 }
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#050925; --surface:#0d1442; --surface-2:#141c55; --fg:#eef0fb; --muted:#a4aacb; --line:#232d6a;
+  --link:#fedd00; --ok:#63d699; --ok-bg:#0e3222; --warn:#ffd45c; --warn-bg:#382d07; --bad:#ff8b80; --bad-bg:#3b1310;
+  --band-a:#00106e; --band-b:#000525; --shadow:0 18px 44px -18px rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#050925; --surface:#0d1442; --surface-2:#141c55; --fg:#eef0fb; --muted:#a4aacb; --line:#232d6a;
+  --link:#fedd00; --ok:#63d699; --ok-bg:#0e3222; --warn:#ffd45c; --warn-bg:#382d07; --bad:#ff8b80; --bad-bg:#3b1310;
+  --band-a:#00106e; --band-b:#000525; --shadow:0 18px 44px -18px rgba(0,0,0,.6); color-scheme:dark}
 /* Alto contraste (panel de accesibilidad) */
 :root.hc{--bg:#ffffff;--surface:#ffffff;--surface-2:#ffffff;--fg:#000000;--muted:#000000;--line:#000000;--link:#000a47;
   --band-a:#000a47;--band-b:#000a47;--glass:#000a47;--glass-line:#ffffff;--shadow:none;color-scheme:light}
@@ -305,19 +313,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ok-panel .bt{display:flex;gap:10px;flex-wrap:wrap}
 .manual-banner{display:flex;gap:10px;align-items:center;background:var(--warn-bg);color:var(--warn);border-radius:14px;padding:10px 14px;font-weight:700;font-size:.875rem;margin-bottom:16px}
 .s-actions{margin-top:16px}
-/* Sitio completo sobre fondo blanco */
-:root{color-scheme:light}
-body::before{background:#ffffff}
-.head{background:rgba(255,255,255,.86);color:#0d1238;border-bottom:1px solid #e3e6f2}
-.head .chip{color:#0d1238;background:#f2f3f9;border-color:#dfe2ef}
-.head .chip:hover{background:#e8eaf5}
-.band.light .eyebrow{color:#da291c}
-.band.light .kpi{background:#f6f7fb;border-color:#dfe2ef;color:#0d1238;-webkit-backdrop-filter:none;backdrop-filter:none}
-.band.light .kpi .meter{background:#dfe2ef}.band.light .kpi .meter i{background:#001489}
-.band.light .s-sub,.band.light .m-hero p{opacity:1;color:#4a5072}
-.motto{background:#ffffff;color:#0d1238;border-top:1px solid #e3e6f2}
-.motto p{color:#001489}.motto small{color:#5a6080;opacity:1}
-.motto .saw{opacity:.2}
 /* Inicio de sesión sobre fondo blanco */
 .band.light{background:#ffffff;color:#0d1238;border-bottom:1px solid #e3e6f2}
 .band.light .saw{opacity:.2}
@@ -487,7 +482,7 @@ footer img{width:34px;height:34px}
 
 <!-- ============ SOCIO ============ -->
 <main id="v-socio" hidden>
-  <section class="band light">
+  <section class="band">
     <canvas data-dots></canvas>
     <div class="saw" aria-hidden="true" style="width:520px;height:520px;right:-160px;top:-170px"><svg><use href="#saw"/></svg></div>
     <div class="wrap s-hero"><span class="eyebrow rv">Hola de nuevo</span><h1 class="rv d1" id="s-nombre"></h1><p class="s-sub rv d2" id="s-sub"></p><div class="s-actions rv d3"><button type="button" class="btn btn-yellow" data-go="macero" style="padding:.6rem 1.2rem">Soy Macero · pasar lista</button></div></div>
@@ -524,7 +519,7 @@ footer img{width:34px;height:34px}
 
 <!-- ============ ADMIN ============ -->
 <main id="v-admin" hidden>
-  <section class="band light">
+  <section class="band">
     <canvas data-dots></canvas>
     <div class="saw" aria-hidden="true" style="width:520px;height:520px;right:-160px;top:-170px"><svg><use href="#saw"/></svg></div>
     <div class="wrap a-hero">
@@ -555,7 +550,7 @@ footer img{width:34px;height:34px}
 
 <!-- ============ SOY MACERO ============ -->
 <main id="v-macero" hidden>
-  <section class="band light">
+  <section class="band">
     <canvas data-dots></canvas>
     <div class="saw" aria-hidden="true" style="width:520px;height:520px;right:-160px;top:-170px"><svg><use href="#saw"/></svg></div>
     <div class="wrap m-hero">
